@@ -17,6 +17,7 @@ unreleased
 * FIX added support for ``icalendar>=7.0.0``.
 * NEW DEPENDENCY sphinxfeed-lsaffre
 * DROPPED DEPENDENCY sphinxcontrib-newsfeed
+* NEW support python 3.14
 
 0.13.0
 ======
