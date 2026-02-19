@@ -243,8 +243,13 @@ def expand(
     # performed
     expand = not bool(vevent.get('RECURRENCE-ID'))
 
-    events_tz = getattr(vevent['DTSTART'].dt, 'tzinfo', None)
-    allday = not isinstance(vevent['DTSTART'].dt, dt.datetime)
+    dtstart_prop = vevent['DTSTART']
+    # Check for VALUE=DATE parameter to detect all-day events
+    # icalendar>=7.0 version returns datetime with tzinfo even for DATE values
+    allday = dtstart_prop.params.get('VALUE') == 'DATE' or \
+        not isinstance(dtstart_prop.dt, dt.datetime)
+    # Don't use timezone for all-day events
+    events_tz = getattr(dtstart_prop.dt, 'tzinfo', None) if not allday else None
 
     def sanitize_datetime(date: dt.date) -> dt.date:
         if allday and isinstance(date, dt.datetime):
@@ -264,6 +269,9 @@ def expand(
         dtstart = vevent['DTSTART'].dt
         if events_tz:
             dtstart = dtstart.replace(tzinfo=None)
+        # For all-day events, ensure dtstart is a date, not datetime.
+        if allday and isinstance(dtstart, dt.datetime):
+            dtstart = dtstart.date()
 
         rrule = dateutil.rrule.rrulestr(
             rrule_param.to_ical().decode(),
