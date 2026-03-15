@@ -581,11 +581,9 @@ def edit_event(event, collection, locale, allow_quit=False, width=80):
             try:
                 start, end, allday = parse_datetime.guessrangefstr(ansi.sub("", value), locale)
                 if not allday:
-                    start_loc = locale["local_timezone"].localize(start)
-                    end_loc = locale["local_timezone"].localize(end)
-                    event.update_start_end(start_loc, end_loc)
-                else:
-                    event.update_start_end(start, end)
+                    start = locale["local_timezone"].localize(start)
+                    end = locale["local_timezone"].localize(end)
+                event.update_start_end(start, end)
                 edited = True
             except Exception:
                 echo("error parsing range")
