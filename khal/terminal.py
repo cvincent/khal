@@ -22,7 +22,7 @@
 """all functions related to terminal display are collected here"""
 
 from itertools import zip_longest
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 
 class NamedColor(NamedTuple):
@@ -55,8 +55,8 @@ COLORS: dict[str, NamedColor] = {
 
 
 def get_color(
-    fg: Optional[str]=None,
-    bg: Optional[str]=None,
+    fg: str | None=None,
+    bg: str | None=None,
     bold_for_light_color: bool=False,
 ) -> str:
     """convert foreground and/or background color in ANSI color codes
@@ -120,8 +120,8 @@ def get_color(
 
 def colored(
     string: str,
-    fg: Optional[str]=None,
-    bg: Optional[str]=None,
+    fg: str | None=None,
+    bg: str | None=None,
     bold_for_light_color: bool=True,
 ) -> str:
     """colorize `string` with ANSI color codes

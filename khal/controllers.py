@@ -26,8 +26,8 @@ import os
 import re
 import textwrap
 from collections import OrderedDict, defaultdict
+from collections.abc import Callable
 from shutil import get_terminal_size
-from typing import Callable, Optional
 
 import pytz
 from click import confirm, echo, prompt, style
@@ -237,16 +237,16 @@ def get_events_between(
 
 def khal_list(
     collection,
-    daterange: Optional[list[str]] = None,
-    conf: Optional[dict] = None,
+    daterange: list[str] | None = None,
+    conf: dict | None = None,
     agenda_format=None,
-    day_format: Optional[str]=None,
+    day_format: str | None=None,
     once=False,
     notstarted: bool = False,
-    width: Optional[int] = None,
+    width: int | None = None,
     env=None,
     datepoint=None,
-    json: Optional[list] = None,
+    json: list | None = None,
 ):
     """returns a list of all events in `daterange`"""
     assert daterange is not None or datepoint is not None
@@ -438,7 +438,7 @@ def new_from_dict(
     event_args: EventCreationTypes,
     collection: CalendarCollection,
     conf,
-    calendar_name: Optional[str]=None,
+    calendar_name: str | None=None,
     format=None,
     env=None,
     json=None,

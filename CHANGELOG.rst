@@ -7,7 +7,7 @@ Package maintainers and users who have to manually update their installation
 may want to subscribe to `GitHub's tag feed
 <https://github.com/geier/khal/tags.atom>`_.
 
-0.13.1
+0.14.0
 ======
 unreleased
 
@@ -18,6 +18,7 @@ unreleased
 * NEW DEPENDENCY sphinxfeed-lsaffre
 * DROPPED DEPENDENCY sphinxcontrib-newsfeed
 * NEW support python 3.14
+* DROPPED support for python versions < 3.10.
 
 0.13.0
 ======

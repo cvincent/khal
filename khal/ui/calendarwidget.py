@@ -26,8 +26,9 @@ if anything doesn't work as expected, please open an issue for khal
 
 import calendar
 import datetime as dt
+from collections.abc import Callable
 from locale import LC_ALL, LC_TIME, getlocale, setlocale
-from typing import Any, Callable, Literal, Optional, TypedDict, Union
+from typing import Any, Literal, TypedDict
 
 import urwid
 
@@ -38,8 +39,8 @@ from khal.utils import get_month_abbr_len
 class MarkType(TypedDict):
     date: dt.date
     pos: tuple[int, int]
-OnPressType = dict[str, Callable[[dt.date, Optional[dt.date]], Optional[str]]]
-GetStylesSignature = Callable[[dt.date, bool], Optional[Union[str, tuple[str, str]]]]
+OnPressType = dict[str, Callable[[dt.date, dt.date | None], str | None]]
+GetStylesSignature = Callable[[dt.date, bool], str | tuple[str, str] | None]
 
 
 setlocale(LC_ALL, '')
@@ -90,7 +91,7 @@ class Date(urwid.WidgetWrap):
         self._get_styles = get_styles
         super().__init__(urwid.Columns(self.halves))
 
-    def set_styles(self, styles: Union[None, str, tuple[str, str]]) -> None:
+    def set_styles(self, styles: None | str | tuple[str, str]) -> None:
         """If single string, sets the same style for both halves, if two
         strings, sets different style for each half.
         """
@@ -237,8 +238,8 @@ class CListBox(urwid.ListBox):
         self._init: bool = True
         self.keybindings = walker.keybindings
         self.on_press = walker.on_press
-        self._marked: Optional[MarkType] = None
-        self._pos_old: Optional[tuple[int, int]] = None
+        self._marked: MarkType | None = None
+        self._pos_old: tuple[int, int] | None = None
         self.body: CalendarWalker
         super().__init__(walker)
 
@@ -281,7 +282,7 @@ class CListBox(urwid.ListBox):
         """set attribute *mark* on the date at row `row` and column `column`"""
         self.body[row].contents[column][0].set_styles('mark')
 
-    def _mark(self, a_date: Optional[dt.date]=None) -> None:
+    def _mark(self, a_date: dt.date | None=None) -> None:
         """make sure everything between the marked entry and `a_date`
         is visually marked, and nothing else"""
 
@@ -333,7 +334,7 @@ class CListBox(urwid.ListBox):
             self._mark(a_day)
         self.body.set_focus_date(a_day)
 
-    def keypress(self, size: bool, key: str) -> Optional[str]:
+    def keypress(self, size: bool, key: str) -> str | None:
         if key in self.keybindings['mark'] + ['esc'] and self._marked:
             self._unmark_all()
             self._marked = None
@@ -371,13 +372,13 @@ class CListBox(urwid.ListBox):
 class CalendarWalker(urwid.SimpleFocusListWalker):
     def __init__(self,
                  on_date_change: Callable[[dt.date], None],
-                 on_press: dict[str, Callable[[dt.date, Optional[dt.date]], Optional[str]]],
+                 on_press: dict[str, Callable[[dt.date, dt.date | None], str | None]],
                  keybindings: dict[str, list[str]],
                  get_styles: GetStylesSignature,
                  firstweekday: int = 0,
                  weeknumbers: Literal['left', 'right', False]=False,
                  monthdisplay: Literal['firstday', 'firstfullweek']='firstday',
-                 initial: Optional[dt.date]=None,
+                 initial: dt.date | None=None,
                  ) -> None:
         self.firstweekday = firstweekday
         self.weeknumbers = weeknumbers
@@ -388,7 +389,7 @@ class CalendarWalker(urwid.SimpleFocusListWalker):
         self.get_styles = get_styles
         self.reset(initial)
 
-    def reset(self, initial: Optional[dt.date]=None) -> None:
+    def reset(self, initial: dt.date | None=None) -> None:
         if initial is None:
             initial = dt.date.today()
         weeks = self._construct_month(initial.year, initial.month)
@@ -532,7 +533,7 @@ class CalendarWalker(urwid.SimpleFocusListWalker):
             month_name = '    '
             attr = None
 
-        this_week: list[tuple[int, Union[Date, urwid.AttrMap]]]
+        this_week: list[tuple[int, Date | urwid.AttrMap]]
         this_week = [(get_month_abbr_len(), urwid.AttrMap(urwid.Text(month_name), attr))]
         for _number, day in enumerate(week):
             new_date = Date(day, self.get_styles)
@@ -586,12 +587,12 @@ class CalendarWidget(urwid.WidgetWrap):
     def __init__(self,
                  on_date_change: Callable[[dt.date], None],
                  keybindings: dict[str, list[str]],
-                 on_press: Optional[OnPressType]=None,
+                 on_press: OnPressType | None=None,
                  firstweekday: int=0,
                  weeknumbers: Literal['left', 'right', False]=False,
                  monthdisplay: Literal['firstday', 'firstfullweek']='firstday',
-                 get_styles: Optional[GetStylesSignature]=None,
-                 initial: Optional[dt.date]=None,
+                 get_styles: GetStylesSignature | None=None,
+                 initial: dt.date | None=None,
                  ) -> None:
         """A calendar widget that can be used in urwid applications
 
@@ -653,7 +654,7 @@ class CalendarWidget(urwid.WidgetWrap):
         weekheader = _calendar.formatweekheader(2)
         dnames = weekheader.split(' ')
 
-        def _get_styles(date: dt.date, focus: bool) -> Optional[str]:
+        def _get_styles(date: dt.date, focus: bool) -> str | None:
             if focus:
                 if date == dt.date.today():
                     return 'today focus'

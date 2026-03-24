@@ -31,7 +31,6 @@ import logging
 import os
 import os.path
 from collections.abc import Iterable
-from typing import Optional, Union
 
 from khal.custom_types import CalendarConfiguration, EventCreationTypes, LocaleConfiguration
 from khal.icalendar import new_vevent
@@ -71,15 +70,15 @@ class CalendarCollection:
                  color: str='',
                  priority: int=10,
                  highlight_event_days: bool=False,
-                 locale: Optional[LocaleConfiguration]=None,
-                 dbpath: Optional[str]=None,
+                 locale: LocaleConfiguration | None=None,
+                 dbpath: str | None=None,
                  ) -> None:
         assert locale
         assert dbpath is not None
         assert calendars is not None
 
         self._calendars: dict[str, CalendarConfiguration] = calendars
-        self._default_calendar_name: Optional[str] = None
+        self._default_calendar_name: str | None = None
         self._storages: dict[str, Vdir] = {}
         file_ext: str
 
@@ -123,7 +122,7 @@ class CalendarCollection:
         return self._calendars.keys()
 
     @property
-    def default_calendar_name(self) -> Optional[str]:
+    def default_calendar_name(self) -> str | None:
         return self._default_calendar_name
 
     @default_calendar_name.setter
@@ -184,7 +183,7 @@ class CalendarCollection:
             self._backend.update(event.raw, event.href, event.etag, calendar=event.calendar)
             self._backend.set_ctag(self._local_ctag(event.calendar), calendar=event.calendar)
 
-    def force_update(self, event: Event, collection: Optional[str]=None) -> None:
+    def force_update(self, event: Event, collection: str | None=None) -> None:
         """update `event` even if an event with the same uid/href already exists"""
         href: str
         calendar = collection if collection is not None else event.calendar
@@ -202,7 +201,7 @@ class CalendarCollection:
             self._backend.update(event.raw, href, etag, calendar=calendar)
             self._backend.set_ctag(self._local_ctag(calendar), calendar=calendar)
 
-    def insert(self, event: Event, collection: Optional[str]=None) -> None:
+    def insert(self, event: Event, collection: str | None=None) -> None:
         """Insert a new event to the vdir and the database
 
         The event will get a new href and etag properties. If ``collection`` is
@@ -230,7 +229,7 @@ class CalendarCollection:
             self._backend.update(event.raw, event.href, event.etag, calendar=calendar)
             self._backend.set_ctag(self._local_ctag(calendar), calendar=calendar)
 
-    def delete(self, href: str, etag: Optional[str], calendar: str) -> None:
+    def delete(self, href: str, etag: str | None, calendar: str) -> None:
         """Delete an event specified by `href` from `calendar`"""
         if self._calendars[calendar]['readonly']:
             raise ReadOnlyCalendarError()
@@ -242,7 +241,7 @@ class CalendarCollection:
 
     def delete_instance(self,
                         href: str,
-                        etag: Optional[str],
+                        etag: str | None,
                         calendar: str,
                         rec_id: dt.datetime,
                         ) -> Event:
@@ -268,11 +267,11 @@ class CalendarCollection:
     def _construct_event(self,
                          item: str,
                          href: str,
-                         start: Optional[Union[dt.datetime, dt.date]] = None,
-                         end: Optional[Union[dt.datetime, dt.date]] = None,
+                         start: dt.datetime | dt.date | None = None,
+                         end: dt.datetime | dt.date | None = None,
                          ref: str='PROTO',
-                         etag: Optional[str]=None,
-                         calendar: Optional[str]=None,
+                         etag: str | None=None,
+                         calendar: str | None=None,
                          ) -> Event:
         assert calendar is not None
         event = Event.fromString(
@@ -302,8 +301,8 @@ class CalendarCollection:
     def create_event_from_ics(self,
                               ical: str,
                               calendar_name: str,
-                              etag: Optional[str]=None,
-                              href: Optional[str]=None,
+                              etag: str | None=None,
+                              href: str | None=None,
                               ) -> Event:
         """creates and returns (but does not insert) a new event from ical
         string"""
@@ -312,7 +311,7 @@ class CalendarCollection:
 
     def create_event_from_dict(self,
                                event_dict: EventCreationTypes,
-                               calendar_name: Optional[str] = None,
+                               calendar_name: str | None = None,
                                ) -> Event:
         """Creates an Event from the method's arguments
         """
@@ -401,7 +400,7 @@ class CalendarCollection:
             update(event.raw, href=href, etag=etag, calendar=calendar)
             return True
         except Exception as e:
-            if not isinstance(e, (UpdateFailed, UnsupportedFeatureError, NonUniqueUID)):
+            if not isinstance(e, UpdateFailed | UnsupportedFeatureError | NonUniqueUID):
                 logger.exception('Unknown exception happened.')
             logger.warning(
                 f'Skipping {calendar}/{href}: {e!s}\n'
@@ -412,7 +411,7 @@ class CalendarCollection:
         """search for the db for events matching `search_string`"""
         return (self._construct_event(*args) for args in self._backend.search(search_string))
 
-    def get_day_styles(self, day: dt.date, focus: bool) -> Optional[Union[str, tuple[str, str]]]:
+    def get_day_styles(self, day: dt.date, focus: bool) -> str | tuple[str, str] | None:
         calendars = self.get_calendars_on(day)
         if len(calendars) == 0:
             return None
@@ -424,7 +423,7 @@ class CalendarCollection:
             return 'highlight_days_multiple'
         return ('calendar ' + calendars[0], 'calendar ' + calendars[1])
 
-    def get_styles(self, date: dt.date, focus: bool) -> Optional[Union[str, tuple[str, str]]]:
+    def get_styles(self, date: dt.date, focus: bool) -> str | tuple[str, str] | None:
         if focus:
             if date == date.today():
                 return 'today focus'

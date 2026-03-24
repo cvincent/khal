@@ -24,7 +24,7 @@ import logging
 import signal
 import sys
 from enum import IntEnum
-from typing import Literal, Optional
+from typing import Literal
 
 import click
 import urwid
@@ -90,7 +90,7 @@ class SelectableText(urwid.Text):
     def selectable(self) -> bool:
         return True
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         return key
 
     def get_cursor_coords(self, size: tuple[int]) -> tuple[int, int]:
@@ -143,7 +143,7 @@ class DateHeader(SelectableText):
 
         return f'{weekday}, {daystr} ({approx_delta})'
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         binds = self._conf['keybindings']
         if key in binds['left']:
             key = 'left'
@@ -223,7 +223,7 @@ class U_Event(urwid.Text):
 
         self.set_text(mark + ' ' + text.replace('\n', newline))
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         binds = self._conf['keybindings']
         if key in binds['left']:
             key = 'left'
@@ -254,11 +254,11 @@ class EventListBox(urwid.ListBox):
         self.set_focus_date_callback = set_focus_date_callback
         super().__init__(*args, **kwargs)
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         return super().keypress(size, key)
 
     @property
-    def focus_event(self) -> Optional[U_Event]:
+    def focus_event(self) -> U_Event | None:
         if self.focus is None:
             return None
         else:
@@ -310,7 +310,7 @@ class DListBox(EventListBox):
         self.body.ensure_date(day)
         self.clean()
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         if key in self._conf['keybindings']['up']:
             key = 'up'
         if key in self._conf['keybindings']['down']:
@@ -614,7 +614,7 @@ class DateListBox(urwid.ListBox):
         title.set_text(title.get_text()[0])
 
     @property
-    def focus_event(self) -> Optional[U_Event]:
+    def focus_event(self) -> U_Event | None:
         if self.body.focus == 0:
             return None
         else:
@@ -642,8 +642,8 @@ class EventColumn(urwid.WidgetWrap):
         self._conf = pane._conf
         self.divider = urwid.Divider('─')
         self.editor = False
-        self._last_focused_date: Optional[dt.date] = None
-        self._eventshown: Optional[tuple[str, str]] = None
+        self._last_focused_date: dt.date | None = None
+        self._eventshown: tuple[str, str] | None = None
         self.event_width = int(self.pane._conf['view']['event_view_weighting'])
         self.delete_status = pane.delete_status
         self.toggle_delete_all = pane.toggle_delete_all
@@ -653,7 +653,7 @@ class EventColumn(urwid.WidgetWrap):
         urwid.WidgetWrap.__init__(self, self.container)
 
     @property
-    def focus_event(self) -> Optional[U_Event]:
+    def focus_event(self) -> U_Event | None:
         """returns the event currently in focus"""
         return self.dlistbox.focus_event
 
@@ -883,7 +883,7 @@ class EventColumn(urwid.WidgetWrap):
         except IndexError:
             pass
 
-    def new(self, date: dt.date, end: Optional[dt.date]=None) -> None:
+    def new(self, date: dt.date, end: dt.date | None=None) -> None:
         """create a new event on `date` at the next full hour and edit it
 
         :param date: default date for new event
@@ -917,7 +917,7 @@ class EventColumn(urwid.WidgetWrap):
     def selectable(self):
         return True
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         prev_shown = self._eventshown
         self._eventshown = None
         self.clear_event_view()
@@ -1028,7 +1028,7 @@ class SearchDialog(urwid.WidgetWrap):
 
         class Search(Edit):
 
-            def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+            def keypress(self, size: tuple[int], key: str | None) -> str | None:
                 if key == 'enter':
                     search_func(self.text)
                     return None
@@ -1115,7 +1115,7 @@ class ClassicView(Pane):
         )
         Pane.__init__(self, columns, title=title, description=description)
 
-    def delete_status(self, uid: str) -> Optional[DeletionType]:
+    def delete_status(self, uid: str) -> DeletionType | None:
         if uid[0] in self._deleted[DeletionType.ALL]:
             return DeletionType.ALL
         elif uid in self._deleted[DeletionType.INSTANCES]:
@@ -1153,7 +1153,7 @@ class ClassicView(Pane):
             event = self.collection.delete_instance(href, etag, account, rec_id)
             updated_etags[event.href] = event.etag
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         binds = self._conf['keybindings']
         if key in binds['search']:
             self.search()
@@ -1292,7 +1292,7 @@ def _add_calendar_colors(
     palette: list[tuple[str, ...]],
     collection: 'CalendarCollection',
     color_mode: Literal['256colors', 'rgb'],
-    base: Optional[str] = None,
+    base: str | None = None,
     attr_template: str = 'calendar {}',
 ) -> list[tuple[str, ...]]:
     """Add the colors for the defined calendars to the palette.

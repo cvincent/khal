@@ -30,7 +30,6 @@ import string
 from calendar import month_abbr, timegm
 from collections.abc import Iterator
 from textwrap import wrap
-from typing import Optional
 
 import icalendar
 import pytz
@@ -77,7 +76,7 @@ def find_last_sgr(string: str) -> tuple[int, int, str]:
     return last.start(), last.end(), last.group(0)
 
 
-def find_unmatched_sgr(string: str) -> Optional[str]:
+def find_unmatched_sgr(string: str) -> str | None:
     reset_pos, _, _ = find_last_reset(string)
     sgr_pos, _, sgr = find_last_sgr(string)
     if sgr_pos > reset_pos:

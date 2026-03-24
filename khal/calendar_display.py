@@ -22,7 +22,6 @@
 import calendar
 import datetime as dt
 from locale import LC_ALL, LC_TIME, getlocale, setlocale
-from typing import Optional, Union
 
 from click import style
 
@@ -82,7 +81,7 @@ def get_color_list(
 def str_highlight_day(
     day: dt.date,
     calendars: list[str],
-    hmethod: Optional[str],
+    hmethod: str | None,
     default_color: str,
     multiple: str,
     multiple_on_overflow: bool,
@@ -122,8 +121,8 @@ def str_highlight_day(
 def str_week(
     week: list[dt.date],
     today: dt.date,
-    collection: Optional[CalendarCollection]=None,
-    hmethod: Optional[str]=None,
+    collection: CalendarCollection | None=None,
+    hmethod: str | None=None,
     default_color: str='',
     multiple: str='',
     multiple_on_overflow: bool=False,
@@ -165,10 +164,10 @@ def str_week(
     return strweek
 
 
-def vertical_month(month: Optional[int]=None,
-                   year: Optional[int]=None,
-                   today: Optional[dt.date]=None,
-                   weeknumber: Union[bool, str]=False,
+def vertical_month(month: int | None=None,
+                   year: int | None=None,
+                   today: dt.date | None=None,
+                   weeknumber: bool | str=False,
                    count: int=3,
                    firstweekday: int=0,
                    monthdisplay: str='firstday',

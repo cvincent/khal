@@ -1,7 +1,5 @@
-from collections.abc import Mapping
-from typing import Callable
-
-from khal._compat import importlib_metadata
+from collections.abc import Callable, Mapping
+from importlib import metadata as importlib_metadata
 
 # This is a shameless ripoff of mdformat's plugin extension API.
 # see:

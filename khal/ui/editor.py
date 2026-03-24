@@ -20,7 +20,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import datetime as dt
-from typing import TYPE_CHECKING, Callable, Literal, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal
 
 import urwid
 
@@ -115,7 +116,7 @@ class DateEdit(urwid.WidgetWrap):
         weeknumbers: Literal['left', 'right', False]=False,
         firstweekday: int=0,
         monthdisplay: Literal['firstday', 'firstfullweek']='firstday',
-        keybindings: Optional[dict[str, list[str]]] = None,
+        keybindings: dict[str, list[str]] | None = None,
     ) -> None:
         datewidth = len(startdt.strftime(dateformat))
         self._dateformat = dateformat
@@ -603,7 +604,7 @@ class EventEditor(urwid.WidgetWrap):
         self._abort_confirmed = False
         self.pane.window.backtrack()
 
-    def keypress(self, size: tuple[int], key: str) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str) -> str | None:
         if key in ['esc'] and self.changed and not self._abort_confirmed:
             self.pane.window.alert(
                 ('light red', 'Unsaved changes! Hit ESC again to discard.'))

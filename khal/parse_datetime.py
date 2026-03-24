@@ -26,8 +26,9 @@ import datetime as dt
 import logging
 import re
 from calendar import isleap
+from collections.abc import Callable
 from time import strptime
-from typing import Any, Callable, Optional, Union
+from typing import Any
 
 import pytz
 
@@ -57,7 +58,7 @@ def timefstr(dtime_list: list[str], timeformat: str) -> dt.datetime:
 def datetimefstr(
     dtime_list: list[str],
     dateformat: str,
-    default_day: Optional[dt.date]=None,
+    default_day: dt.date | None=None,
     infer_year: bool=True,
     in_future: bool=True,
 ) -> dt.datetime:
@@ -193,7 +194,7 @@ def datetimefstr_weekday(dtime_list: list[str], timeformat: str, infer_year: boo
 def guessdatetimefstr(
     dtime_list: list[str],
     locale: LocaleConfiguration,
-    default_day: Optional[dt.date]=None,
+    default_day: dt.date | None=None,
     in_future=True,
 ) -> tuple[dt.datetime, bool]:
     """
@@ -321,7 +322,7 @@ def guesstimedeltafstr(delta_string: str) -> dt.timedelta:
     return res
 
 
-def guessrangefstr(daterange: Union[str, list[str]],
+def guessrangefstr(daterange: str | list[str],
                    locale: LocaleConfiguration,
                    default_timedelta_date: dt.timedelta=dt.timedelta(days=1),
                    default_timedelta_datetime: dt.timedelta=dt.timedelta(hours=1),
@@ -422,7 +423,7 @@ def guessrangefstr(daterange: Union[str, list[str]],
 def rrulefstr(repeat: str,
               until: str,
               locale: LocaleConfiguration,
-              timezone: Optional[dt.tzinfo],
+              timezone: dt.tzinfo | None,
               ) -> RRuleMapType:
     if repeat in ["daily", "weekly", "monthly", "yearly"]:
         rrule_settings: RRuleMapType = {'freq': repeat}
@@ -457,9 +458,9 @@ def eventinfofstr(info_string: str,
 
     parts = info_string.split(' ')
     summary = None
-    start: Optional[Union[dt.datetime, dt.date]] = None
-    end: Optional[Union[dt.datetime, dt.date]] = None
-    tz: Optional[pytz.BaseTzInfo] = None
+    start: dt.datetime | dt.date | None = None
+    end: dt.datetime | dt.date | None = None
+    tz: pytz.BaseTzInfo | None = None
     allday: bool = False
     for i in reversed(range(1, len(parts) + 1)):
         try:

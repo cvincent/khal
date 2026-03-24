@@ -25,9 +25,9 @@ import glob
 import logging
 import os
 import pathlib
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from os.path import expanduser, expandvars, join
-from typing import Callable, Literal, Optional, Union
+from typing import Literal
 
 import pytz
 import xdg
@@ -48,7 +48,7 @@ from .exceptions import InvalidSettingsError
 logger = logging.getLogger('khal')
 
 
-def is_timezone(tzstring: Optional[str]) -> dt.tzinfo:
+def is_timezone(tzstring: str | None) -> dt.tzinfo:
     """tries to convert tzstring into a pytz timezone or return local timezone
 
     raises a VdtvalueError if tzstring is not valid
@@ -71,7 +71,7 @@ def is_timedelta(string: str) -> dt.timedelta:
         raise VdtValueError(f"Invalid timedelta: {string}")
 
 
-def weeknumber_option(option: str) -> Union[Literal['left', 'right'], Literal[False]]:
+def weeknumber_option(option: str) -> Literal['left', 'right'] | Literal[False]:
     """checks if *option* is a valid value
 
     :param option: the option the user set in the config file
@@ -157,7 +157,7 @@ def test_default_calendar(config) -> None:
         raise InvalidSettingsError()
 
 
-def get_color_from_vdir(path: str) -> Optional[str]:
+def get_color_from_vdir(path: str) -> str | None:
     try:
         color = Vdir(path, '.ics').get_meta('color')
     except CollectionNotFoundError:

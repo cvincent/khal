@@ -34,7 +34,7 @@ try:
 except ModuleNotFoundError:
     from validate import Validator
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from .exceptions import CannotParseConfigFileError, InvalidSettingsError, NoConfigFile
 from .utils import (
@@ -54,7 +54,7 @@ logger = logging.getLogger('khal')
 SPECPATH = os.path.join(os.path.dirname(__file__), 'khal.spec')
 
 
-def find_configuration_file() -> Optional[str]:
+def find_configuration_file() -> str | None:
     """Return the configuration filename.
 
     Check all the paths for configuration files defined in the XDG Base Directory
@@ -73,7 +73,7 @@ def find_configuration_file() -> Optional[str]:
 
 
 def get_config(
-        config_path: Optional[str]=None,
+        config_path: str | None=None,
         _get_color_from_vdir: Callable=get_color_from_vdir,
         _get_vdir_type: Callable=get_vdir_type) -> ConfigObj:
     """reads the config file, validates it and return a config dict

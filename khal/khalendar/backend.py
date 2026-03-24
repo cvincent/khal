@@ -29,7 +29,7 @@ import sqlite3
 from collections.abc import Iterable, Iterator
 from enum import IntEnum
 from os import makedirs, path
-from typing import Any, Optional, Union
+from typing import Any
 
 import icalendar
 import icalendar.cal
@@ -76,7 +76,7 @@ class SQLiteDb:
 
     def __init__(self,
                  calendars: Iterable[str],
-                 db_path: Optional[str],
+                 db_path: str | None,
                  locale: LocaleConfiguration,
                  ) -> None:
         assert db_path is not None
@@ -203,7 +203,7 @@ class SQLiteDb:
                vevent_str: str,
                href: str,
                etag: str='',
-               calendar: Optional[str]=None,
+               calendar: str | None=None,
                ) -> None:
         """insert a new or update an existing event into the db
 
@@ -252,7 +252,7 @@ class SQLiteDb:
         self.sql_ex(sql_s, stuple)
 
     def update_vcf_dates(self, vevent_str: str, href: str, etag: str='',
-                         calendar: Optional[str]=None) -> None:
+                         calendar: str | None=None) -> None:
         """insert events from a vcard into the db
 
         This is will parse BDAY, ANNIVERSARY, X-ANNIVERSARY and X-ABDATE fields.
@@ -408,7 +408,7 @@ class SQLiteDb:
                 stuple_n = (dbstart, dbend, href, ref, dtype, rec_inst, calendar)
                 self.sql_ex(recs_sql_s, stuple_n)
 
-    def get_ctag(self, calendar: str) -> Optional[str]:
+    def get_ctag(self, calendar: str) -> str | None:
         stuple = (calendar, )
         sql_s = 'SELECT ctag FROM calendars WHERE calendar = ?;'
         try:
@@ -423,7 +423,7 @@ class SQLiteDb:
         self.sql_ex(sql_s, stuple)
         self.conn.commit()
 
-    def get_etag(self, href: str, calendar: str) -> Optional[str]:
+    def get_etag(self, href: str, calendar: str) -> str | None:
         """get etag for href
 
         return: etag
@@ -548,8 +548,8 @@ class SQLiteDb:
         """return floating events between `start` and `end`"""
         assert start.tzinfo is None
         assert end.tzinfo is None
-        start_dt: Union[dt.datetime, dt.date]
-        end_dt: Union[dt.datetime, dt.date]
+        start_dt: dt.datetime | dt.date
+        end_dt: dt.datetime | dt.date
 
         start_u = utils.to_unix_time(start)
         end_u = utils.to_unix_time(end)

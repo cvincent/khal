@@ -25,7 +25,6 @@ import datetime as dt
 import logging
 from collections import defaultdict
 from hashlib import sha256
-from typing import Optional, Union
 
 import dateutil.rrule
 import icalendar
@@ -94,15 +93,15 @@ def new_vevent(locale,
                dtstart: dt.date,
                dtend: dt.date,
                summary: str,
-               timezone: Optional[pytz.BaseTzInfo]=None,
+               timezone: pytz.BaseTzInfo | None=None,
                allday: bool=False,
-               description: Optional[str]=None,
-               location: Optional[str]=None,
-               categories: Optional[Union[list[str], str]]=None,
-               repeat: Optional[str]=None,
+               description: str | None=None,
+               location: str | None=None,
+               categories: list[str] | str | None=None,
+               repeat: str | None=None,
                until=None,
-               alarms: Optional[str]=None,
-               url: Optional[str]=None,
+               alarms: str | None=None,
+               url: str | None=None,
                ) -> icalendar.Event:
     """create a new event
 
@@ -217,7 +216,7 @@ def ics_from_list(
 def expand(
     vevent: icalendar.Event,
     href: str='',
-) -> Optional[list[tuple[dt.datetime, dt.datetime]]]:
+) -> list[tuple[dt.datetime, dt.datetime]] | None:
     """
     Constructs a list of start and end dates for all recurring instances of the
     event defined in vevent.

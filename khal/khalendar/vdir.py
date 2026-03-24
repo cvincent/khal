@@ -8,9 +8,9 @@ import errno
 import os
 import tempfile
 import uuid
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from hashlib import sha1
-from typing import IO, Callable, Optional, Protocol
+from typing import IO, Protocol
 
 from khal.custom_types import PathLike, SupportsRaw
 
@@ -52,7 +52,7 @@ def _href_safe(uid: str, safe: str=SAFE_UID_CHARS) -> bool:
     return not bool(set(uid) - set(safe))
 
 
-def _generate_href(uid: Optional[str]=None, safe: str=SAFE_UID_CHARS) -> str:
+def _generate_href(uid: str | None=None, safe: str=SAFE_UID_CHARS) -> str:
     if not uid:
         return str(uuid.uuid4().hex)
     elif not _href_safe(uid, safe):
@@ -126,7 +126,7 @@ class Item:
         self.raw = raw
 
     @cached_property
-    def uid(self) -> Optional[str]:
+    def uid(self) -> str | None:
         uid = ''
         lines = iter(self.raw.splitlines())
         for line in lines:
@@ -205,7 +205,7 @@ class VdirBase:
     def _get_filepath(self, href: str) -> str:
         return os.path.join(self.path, href)
 
-    def _get_href(self, uid: Optional[str]) -> str:
+    def _get_href(self, uid: str | None) -> str:
         return _generate_href(uid) + self.fileext
 
     def list(self) -> Iterable[tuple[str, str]]:
@@ -277,7 +277,7 @@ class VdirBase:
 
         return etag
 
-    def delete(self, href: str, etag: Optional[str]) -> None:
+    def delete(self, href: str, etag: str | None) -> None:
         fpath = self._get_filepath(href)
         if not os.path.isfile(fpath):
             raise NotFoundError(href)
@@ -286,7 +286,7 @@ class VdirBase:
             raise WrongEtagError(etag, actual_etag)
         os.remove(fpath)
 
-    def get_meta(self, key: str) -> Optional[str]:
+    def get_meta(self, key: str) -> str | None:
         fpath = os.path.join(self.path, key)
         try:
             with open(fpath, 'rb') as f:
@@ -333,7 +333,7 @@ class Color:
 class ColorMixin:
     color_type: type[Color] = Color
 
-    def get_color(self: HasMetaProtocol) -> Optional[str]:
+    def get_color(self: HasMetaProtocol) -> str | None:
         try:
             return self.color_type(self.get_meta('color'))
         except ValueError:

@@ -25,7 +25,7 @@ helper functions."""
 import datetime as dt
 import logging
 import os
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
 import icalendar
 import icalendar.cal
@@ -61,15 +61,15 @@ class Event:
     def __init__(self,
                  vevents: dict[str, icalendar.Event],
                  locale: LocaleConfiguration,
-                 ref: Optional[str] = None,
+                 ref: str | None = None,
                  readonly: bool = False,
-                 href: Optional[str] = None,
-                 etag: Optional[str] = None,
-                 calendar: Optional[str] = None,
-                 color: Optional[str] = None,
-                 start: Optional[dt.datetime] = None,
-                 end: Optional[dt.datetime] = None,
-                 addresses: Optional[list[str]] =None,
+                 href: str | None = None,
+                 etag: str | None = None,
+                 calendar: str | None = None,
+                 color: str | None = None,
+                 start: dt.datetime | None = None,
+                 end: dt.datetime | None = None,
+                 addresses: list[str] | None =None,
                  ):
         """
         :param start: start datetime of this event instance
@@ -128,8 +128,8 @@ class Event:
     @classmethod
     def fromVEvents(cls,
                     events_list: list[icalendar.Event],
-                    ref: Optional[str]=None,
-                    start: Optional[dt.datetime]=None,
+                    ref: str | None=None,
+                    start: dt.datetime | None=None,
                     **kwargs) -> 'Event':
         assert isinstance(events_list, list)
 
@@ -263,7 +263,7 @@ class Event:
             self._vevents['PROTO'].add('RRULE', rrule)
 
     @property
-    def recurrence_id(self) -> Union[dt.datetime, str]:
+    def recurrence_id(self) -> dt.datetime | str:
         """return the "original" start date of this event (i.e. their recurrence-id)
         """
         if self.ref == 'PROTO':
@@ -594,7 +594,7 @@ class Event:
 
     def attributes(
             self,
-            relative_to: Union[tuple[dt.date, dt.date], dt.date],
+            relative_to: tuple[dt.date, dt.date] | dt.date,
             env=None,
             colors: bool=True,
     ):
@@ -814,7 +814,7 @@ class Event:
         return self._vevents[self.ref].get('STATUS', '')
 
     @property
-    def partstat(self) -> Optional[str]:
+    def partstat(self) -> str | None:
         for attendee in self._vevents[self.ref].get('ATTENDEE', []):
             for address in self.addresses:
                 if attendee == 'mailto:' + address:
@@ -920,8 +920,8 @@ class AllDayEvent(Event):
 
 def create_timezone(
     tz: pytz.BaseTzInfo,
-    first_date: Optional[dt.datetime]=None,
-    last_date: Optional[dt.datetime]=None
+    first_date: dt.datetime | None=None,
+    last_date: dt.datetime | None=None
 ) -> icalendar.Timezone:
     """
     create an icalendar vtimezone from a pytz.tzinfo object

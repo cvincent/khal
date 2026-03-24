@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-from typing import Literal, Optional, Protocol, TypedDict, Union
+from typing import Literal, Protocol, TypedDict
 
 import pytz
 
@@ -23,14 +23,14 @@ class LocaleConfiguration(TypedDict):
     longdateformat: str
     datetimeformat: str
     longdatetimeformat: str
-    weeknumbers: Union[str, bool]
+    weeknumbers: str | bool
     firstweekday: int
     unicode_symbols: bool
 
 
 class SupportsRaw(Protocol):
     @property
-    def uid(self) -> Optional[str]:
+    def uid(self) -> str | None:
         ...
 
     @property
@@ -42,8 +42,8 @@ class SupportsRaw(Protocol):
 EventTuple = tuple[
     str,
     str,
-    Union[dt.date, dt.datetime],
-    Union[dt.date, dt.datetime],
+    dt.date | dt.datetime,
+    dt.date | dt.datetime,
     str,
     str,
     str,
@@ -68,16 +68,16 @@ class EventCreationTypes(TypedDict):
     summary: str
     description: str
     allday: bool
-    location: Optional[str]
-    categories: Optional[Union[str, list[str]]]
-    repeat: Optional[str]
+    location: str | None
+    categories: str | list[str] | None
+    repeat: str | None
     until: str
     alarms: str
     timezone: pytz.BaseTzInfo
     url: str
 
 
-PathLike = Union[str, os.PathLike]
+PathLike = str| os.PathLike
 
 WeekNumbersType = Literal['left', 'right', False]
 MonthDisplayType = Literal['firstday', 'firstfullweek']

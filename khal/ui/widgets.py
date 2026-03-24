@@ -26,7 +26,6 @@ if they are large, into their own files
 """
 import datetime as dt
 import re
-from typing import Optional
 
 import urwid
 
@@ -75,7 +74,7 @@ def goto_end_of_line(text):
 class ExtendedEdit(urwid.Edit):
     """A text editing widget supporting some more editing commands"""
 
-    def keypress(self, size: tuple[int], key: Optional[str]) -> Optional[str]:
+    def keypress(self, size: tuple[int], key: str | None) -> str | None:
         if key == 'ctrl w':
             self._delete_word()
         elif key == 'ctrl u':
@@ -560,7 +559,7 @@ class AlarmsEditor(urwid.WidgetWrap):
         """clear the alarm list"""
         self.pile.contents.clear()
 
-    def add_alarm(self, button, timedelta: Optional[dt.timedelta] = None):
+    def add_alarm(self, button, timedelta: dt.timedelta | None = None):
         if timedelta is None:
             timedelta = dt.timedelta(0)
         self.pile.contents.insert(

@@ -19,7 +19,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from typing import Optional
 
 from khal.exceptions import Error, FatalError, UnsupportedFeatureError
 
@@ -65,7 +64,7 @@ class UpdateFailed(Error):
 class DuplicateUid(Error):
 
     """an event with this UID already exists"""
-    existing_href: Optional[str] = None
+    existing_href: str | None = None
 
 
 class NonUniqueUID(Error):
