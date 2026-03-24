@@ -30,12 +30,10 @@ class LocaleConfiguration(TypedDict):
 
 class SupportsRaw(Protocol):
     @property
-    def uid(self) -> str | None:
-        ...
+    def uid(self) -> str | None: ...
 
     @property
-    def raw(self) -> str:
-        ...
+    def raw(self) -> str: ...
 
 
 # set this to TypeAlias once we support that python version (PEP613)
@@ -77,7 +75,7 @@ class EventCreationTypes(TypedDict):
     url: str
 
 
-PathLike = str| os.PathLike
+PathLike = str | os.PathLike
 
-WeekNumbersType = Literal['left', 'right', False]
-MonthDisplayType = Literal['firstday', 'firstfullweek']
+WeekNumbersType = Literal["left", "right", False]
+MonthDisplayType = Literal["firstday", "firstfullweek"]
