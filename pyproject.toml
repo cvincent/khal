@@ -63,6 +63,12 @@ repository = "https://github.com/pimutils/khal"
 khal = "khal.cli:main_khal"
 ikhal = "khal.cli:main_ikhal"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+  # hypothesis triggers warnings while walking modules inside urwid.
+  "ignore:.*urwid\\.(lcd_display|html_fragment|web_display|monitored_list|listbox|treetools) is moved to.*:DeprecationWarning",
+]
+
 [build-system]
 requires = ["setuptools>=77", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
