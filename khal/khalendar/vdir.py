@@ -87,7 +87,7 @@ def get_etag_from_file(f) -> str:
     mtime = getattr(stat, "st_mtime_ns", None)
     if mtime is None:
         mtime = stat.st_mtime
-    return f"{mtime:.9f}"
+    return f"{mtime}"
 
 
 class VdirError(IOError):
